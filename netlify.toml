@@ -1,5 +1,10 @@
 [build]
-  publish = "public"
+  publish = "."
 
 [functions]
   directory = "netlify/functions"
+
+[[redirects]]
+  from = "/api/fpl/*"
+  to = "/.netlify/functions/fpl?path=:splat"
+  status = 200

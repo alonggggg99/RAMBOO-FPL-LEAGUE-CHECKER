@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>RAMBOO FPL LEAGUE CHECKER by Muqri MS</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="hero"><img src="ramboo_fpl_header.png" alt="RAMBOO FPL League Checker"></header>
+
+  <main class="layout">
+    <aside class="card input-card">
+      <h2>👥 Enter FPL Team IDs</h2>
+      <p class="muted">Paste one or multiple Team IDs. Labels and table formatting are supported.</p>
+      <textarea id="ids" placeholder="Example:\nAna De Armas – 456686\nBravo 1 - 9128710\n| Beca 3:9129687 |"></textarea>
+      <button id="check" class="btn primary">⌕ CHECK TEAMS</button>
+      <div class="button-row">
+        <button id="clear" class="btn light">♻ CLEAR</button>
+        <button id="export" class="btn light">⇩ EXPORT CSV</button>
+      </div>
+      <div class="note">
+        <strong>ⓘ Note</strong>
+        <ul>
+          <li>Shows only PRIVATE leagues</li>
+          <li>Public/global leagues are excluded</li>
+          <li>Accepts -, –, —, :, | and &lt;br&gt;</li>
+          <li>Retrieves latest FPL data</li>
+          <li>No FPL login required</li>
+        </ul>
+      </div>
+      <div class="tagline">Up the Game!</div>
+    </aside>
+
+    <section class="card results-card">
+      <div class="tabs">
+        <button class="tab active">▦ League Memberships</button>
+        <button class="tab" disabled>♟ Team Summary</button>
+        <button class="tab" disabled>🔗 Common Leagues</button>
+        <button id="refresh" class="btn refresh">⟳ REFRESH</button>
+      </div>
+      <div class="title-row">
+        <div>
+          <h2>⬟ Private League Memberships</h2>
+          <p class="muted">List of private leagues joined by the provided Team IDs</p>
+        </div>
+        <div class="filter-wrap">
+          <label for="leagueFilter">League Filter</label>
+          <div class="filter-line">
+            <input id="leagueFilter" type="text" placeholder="e.g. GW3">
+            <button id="clearFilter" class="btn tiny">CLEAR</button>
+          </div>
+          <span>Case-insensitive — shows leagues containing this word</span>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Team ID</th><th>Manager</th><th>Team Name</th><th>League Name (Private)</th>
+            <th>League ID</th><th>Rank</th><th>Points</th>
+          </tr></thead>
+          <tbody id="results"></tbody>
+        </table>
+        <div id="empty" class="empty">No results yet. Enter Team IDs and click CHECK TEAMS.</div>
+      </div>
+    </section>
+  </main>
+
+  <footer><span class="ready"><i></i> <span id="status">Ready</span></span><span>“ FANTASY FOOTBALL BRINGS PEOPLE TOGETHER ”</span><span>Version 2.0 Web | By Muqri MS</span></footer>
+  <script src="app.js"></script>
+</body>
+</html>
