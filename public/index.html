@@ -1,0 +1,35 @@
+<!doctype html><html><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#061d57"><link rel="manifest" href="/manifest.json">
+<title>RAMBOO FPL LEAGUE CHECKER</title>
+<style>
+:root{--b:#075fe5;--d:#061d57;--bg:#eef5ff;--bd:#b9d2f7}*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Segoe UI,Arial;color:#172c55}
+.header{height:185px;background:#061d57 url('/ramboo_header.png') center/cover no-repeat}.body{display:flex;gap:10px;padding:10px;min-height:calc(100vh - 227px)}
+.card{background:white;border:1px solid var(--bd);box-shadow:0 2px 8px #0b3b7d12;border-radius:5px}.left{width:315px;padding:18px;flex:none}.right{flex:1;min-width:0;padding:14px}
+h2{font-size:13px;margin:0 0 3px;color:var(--d)}.sub{font-size:9px;color:#49638d;margin-bottom:10px}textarea{width:100%;height:125px;border:1px solid var(--bd);padding:10px;font:12px Consolas}
+button{border:0;cursor:pointer;font-weight:700;font-family:inherit;border-radius:5px}.primary{width:100%;background:var(--b);color:#fff;padding:12px;margin:14px 0 10px}.secondary{background:#eaf2ff;color:var(--d);padding:9px 8px;width:49%}
+.note{margin-top:18px;background:#edf5ff;padding:10px 12px;font-size:9px;line-height:1.8;color:#294b7e}.script{font-family:cursive;color:var(--b);text-align:right;font-size:17px;font-weight:700;margin-top:15px}
+.tabs{display:flex;gap:6px;border-bottom:1px solid #e1ebf8;padding-bottom:8px;overflow:auto}.tab{padding:9px 15px;background:#e8f1ff;color:var(--d);white-space:nowrap}.tab.active{background:var(--b);color:white}.refresh{margin-left:auto;background:white;color:var(--b);border:1px solid var(--bd);padding:8px 15px}
+.title{margin:14px 6px 7px}.title h3{margin:0;color:var(--d);font-size:13px}.title p{margin:3px 0;color:#49638d;font-size:9px}.tablewrap{overflow:auto;max-height:calc(100vh - 350px);border:1px solid #dbe8f8}
+table{width:100%;border-collapse:collapse;font-size:9px}th{position:sticky;top:0;background:#e5eefb;color:var(--d);text-align:left;padding:9px;white-space:nowrap}td{padding:9px;border-top:1px solid #edf2f8;white-space:nowrap}.footer{height:42px;background:var(--d);color:white;display:flex;align-items:center;padding:0 20px;font-size:8px}.ready{color:#20e070;font-weight:700}.quote{flex:1;text-align:center}.ver{color:#bcd3ff}
+@media(max-width:850px){.body{flex-direction:column}.left{width:auto}.header{height:145px}.tablewrap{max-height:520px}.quote{display:none}}
+</style></head><body>
+<div class="header"></div><div class="body"><div class="card left">
+<h2>👥 Enter FPL Team IDs</h2><div class="sub">Enter one Team ID per line</div>
+<textarea id="ids" placeholder="123456&#10;234567&#10;345678"></textarea>
+<button class="primary" id="check">⌕ CHECK TEAMS</button><div style="display:flex;justify-content:space-between">
+<button class="secondary" id="clear">♻ CLEAR</button><button class="secondary" id="export">⇩ EXPORT CSV</button></div>
+<div class="note"><b style="color:#075fe5">ⓘ Note</b><br>• Shows only PRIVATE / INVITATIONAL leagues<br>• Public/global leagues excluded<br>• Multiple Team IDs<br>• Latest FPL data<br>• CSV export<br>• No FPL login required</div>
+<div class="script">Up the Game!</div><div id="status" style="font-size:9px;color:#49638d;margin-top:8px">Ready</div>
+</div><div class="card right"><div class="tabs"><button class="tab active">▦ League Memberships</button><button class="tab">♟ Team Summary</button><button class="tab">🔗 Common Leagues</button><button class="refresh" id="refresh">⟳ REFRESH</button></div>
+<div class="title"><h3>⬟ Private League Memberships</h3><p>List of private leagues joined by the provided Team IDs</p></div>
+<div class="tablewrap"><table id="results"><thead><tr><th>Team ID</th><th>Manager</th><th>Team Name</th><th>League Name (Private)</th><th>League ID</th><th>Rank</th><th>Points</th></tr></thead><tbody><tr><td colspan="7" style="text-align:center;padding:35px;color:#7890b5">Enter Team IDs and click CHECK TEAMS</td></tr></tbody></table></div></div></div>
+<div class="footer"><span class="ready">● Ready</span><span class="quote">“ FANTASY FOOTBALL BRINGS PEOPLE TOGETHER ”</span><span class="ver">Version 1.0 | By Muqri MS</span></div>
+<script>
+let rows=[];const $=x=>document.getElementById(x);function status(x){$("status").textContent=x}
+function ids(){return[...new Set($("ids").value.replace(/[;,\n\t]/g," ").split(/\s+/).map(Number).filter(n=>Number.isInteger(n)&&n>0))]}
+function render(){let b=$("results").querySelector("tbody");b.innerHTML="";if(!rows.length){b.innerHTML='<tr><td colspan="7" style="text-align:center;padding:35px;color:#7890b5">No private/invitational leagues found.</td></tr>';return}for(let r of rows){let tr=document.createElement("tr");[r.team_id,r.manager,r.team_name,r.league,r.league_id,r.rank,r.points].forEach(v=>{let td=document.createElement("td");td.textContent=v??"";tr.appendChild(td)});b.appendChild(tr)}}
+async function check(){let a=ids();if(!a.length)return alert("Please enter at least one valid FPL Team ID.");rows=[];render();$("check").disabled=true;status("Checking "+a.length+" team(s)...");try{let r=await fetch("/api/check?ids="+encodeURIComponent(a.join(",")));let d=await r.json();if(!r.ok)throw Error(d.error||"Server error");rows=d.rows||[];render();status("Completed: "+rows.length+" private league membership(s) found");if(d.errors?.length)alert(d.errors.join("\n"))}catch(e){status("Unable to fetch FPL data.");alert("Could not retrieve FPL data.\n\n"+e.message)}finally{$("check").disabled=false}}
+$("check").onclick=check;$("refresh").onclick=check;$("clear").onclick=()=>{$("ids").value="";rows=[];render();status("Ready")};$("export").onclick=()=>{if(!rows.length)return alert("Run a check first.");let f=["team_id","manager","team_name","league","league_id","rank","points"],c=[f.join(",")].concat(rows.map(r=>f.map(x=>`"${String(r[x]??"").replaceAll('"','""')}"`).join(","))).join("\r\n"),a=document.createElement("a");a.href=URL.createObjectURL(new Blob([c],{type:"text/csv"}));a.download="RAMBOO_FPL_PRIVATE_LEAGUES.csv";a.click()};
+if("serviceWorker"in navigator)navigator.serviceWorker.register("/sw.js");
+</script></body></html>
